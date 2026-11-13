@@ -59,6 +59,20 @@ Alimentos com **menor prazo de validade** ou que necessitam de **cadeia refriger
 
 ---
 
+## 📋 Lista de Requisitos
+
+Requisitos definidos na 1ª entrega (documento `docs/EcoLog Alimentos.pdf`), na ordem do fluxo operacional:
+
+1. **O sistema deve permitir o cadastro de pontos de coleta parceiros**, com razão social, CNPJ, endereço completo de coleta, telefone e e-mail de contato.
+2. **O sistema deve permitir o cadastro de instituições receptoras de alimentos**, com razão social, CNPJ, capacidade de armazenamento (refrigerado e seco), endereço de entrega, telefone, e-mail e responsável institucional.
+3. **O sistema deve permitir o cadastro de transportadores parceiros**, com razão social, CNPJ/CPF, tipo de veículo (caminhão, van ou furgão), capacidade volumétrica/peso de carga, motorista responsável, telefone e e-mail.
+4. **O sistema deve permitir o registro de lotes de alimentos para resgate**, com descrição do produto, categoria, data de validade, quantidade em quilogramas e exigência de conservação térmica.
+5. **O sistema deve permitir a criação de uma ordem de transporte logístico**, com código identificador, data agendada de coleta, ponto de coleta de origem, instituição de destino, status operacional inicial e a listagem de lotes de alimentos vinculados à carga.
+6. **O sistema deve permitir a consulta e atualização do status de uma ordem de transporte**, com data da alteração, novo status (Pendente, Em Trânsito, Concluída ou Cancelada) e observações operacionais.
+7. **O sistema deve permitir o cancelamento de uma ordem de transporte pendente**, com data do cancelamento e justificativa operacional detalhada do cancelamento.
+
+---
+
 ## ⚙️ Funcionalidades
 
 Entre as principais funcionalidades previstas estão:
@@ -117,6 +131,24 @@ A prioridade poderá considerar fatores como:
 * Tipo de embalagem.
 
 Os lotes perecíveis possuem regras específicas e podem receber prioridade superior aos alimentos não perecíveis.
+
+### Como a prioridade é calculada (escala de 0 a 100)
+
+| Fator | `LotePerecivel` | `LoteNaoPerecivel` |
+| --- | --- | --- |
+| Vence hoje | 70 | 35 |
+| Vence em 1 dia | 60 | 35 |
+| Vence em 2 a 3 dias | 45 | 35 |
+| Vence em 4 a 7 dias | 30 | 35 |
+| Vence em 8 a 30 dias | 15 | 20 |
+| Vence em mais de 30 dias | 15 | 10 |
+| Conservação | +30 congelado (máx. ≤ 0 °C), +20 refrigerado (máx. ≤ 8 °C), +5 ambiente | — |
+| Volume | — | +10 (≥ 500 kg), +5 (≥ 100 kg) |
+| Embalagem | — | +5 se for de vidro (frágil) |
+
+* Lotes vencidos ficam com prioridade **0** e não podem ser cadastrados.
+* A prioridade da ordem (`calcularPrioridadeGeral`) é a do seu lote mais urgente.
+* A opção **Fila de prioridade** lista as ordens pendentes da mais urgente para a menos urgente.
 
 ---
 
@@ -319,7 +351,7 @@ Possui informações como:
 
 O diagrama UML representa as principais entidades e seus relacionamentos.
 
-![Diagrama de Classes](https://github.com/judesune/EcoLog-Alimentos/blob/main/docs/Diagrama%20de%20Classes%20UML.pdf)
+📄 [Abrir o Diagrama de Classes (PDF)](docs/Diagrama%20de%20Classes%20UML.pdf)
 
 ---
 
@@ -358,7 +390,9 @@ ON DELETE CASCADE
 
 # 🗃️ Diagrama Entidade-Relacionamento
 
-![DER](https://github.com/judesune/EcoLog-Alimentos/blob/main/docs/DER.pdf)
+📄 [Abrir o DER (PDF)](docs/DER.pdf)
+
+O script de criação das tabelas está em [`database/schema.sql`](database/schema.sql) e segue exatamente o DER. A herança de `LoteAlimento` é gravada em uma única tabela (`tb_lote_alimento`), e a coluna `tipo_lote` (`PERECIVEL` ou `NAO_PERECIVEL`) indica qual subclasse Java deve ser recriada na leitura.
 
 ---
 
@@ -368,11 +402,13 @@ ON DELETE CASCADE
 
 * Java
 * JDK 17 ou 21
-* JDBC
+* JDBC (driver `mysql-connector-j`)
+* Maven (via Maven Wrapper — não precisa instalar)
+* JUnit 5 (testes automatizados)
 
 ### Banco de Dados
 
-* MySQL 8.0
+* MySQL 8.0 ou superior
 
 ### Modelagem
 
@@ -390,41 +426,163 @@ ON DELETE CASCADE
 # 📁 Estrutura do Projeto
 
 ```text
-AEP/
-│
-├── src/
-│   └── código-fonte Java
-│
+EcoLog-Alimentos/
 ├── database/
-│   └── schema.sql
-│
+│   ├── schema.sql                  # criação do banco e das tabelas (DER)
+│   └── dados-exemplo.sql           # dados opcionais para demonstração
 ├── docs/
 │   ├── Diagrama de Classes UML.pdf
 │   ├── DER.pdf
 │   └── EcoLog Alimentos.pdf
-│
-├── README.md
-│
-└── .gitignore
+├── src/
+│   ├── main/
+│   │   ├── java/br/com/ecolog/
+│   │   │   ├── App.java            # ponto de entrada (monta as camadas)
+│   │   │   ├── config/             # ConexaoBanco (JDBC)
+│   │   │   ├── controller/         # menus do terminal
+│   │   │   ├── model/              # entidades do diagrama de classes
+│   │   │   ├── repository/         # acesso ao MySQL (CRUD)
+│   │   │   ├── service/            # regras de negócio e validações
+│   │   │   └── view/               # leitura/escrita no terminal
+│   │   └── resources/
+│   │       └── database.properties # configuração padrão da conexão
+│   └── test/java/br/com/ecolog/    # testes JUnit
+├── .mvn/wrapper/                   # Maven Wrapper
+├── mvnw / mvnw.cmd                 # Maven Wrapper (Linux-macOS / Windows)
+├── pom.xml
+└── README.md
 ```
 
 ---
 
-# ▶️ Requisitos
+# ▶️ Como Executar
 
-Para executar o projeto será necessário possuir:
+### 1. Pré-requisitos
 
-```text
-Java JDK 17 ou 21
-MySQL 8.0+
-Git
+| Ferramenta | Versão | Observação |
+| --- | --- | --- |
+| Java JDK | 17 ou 21 | `java -version` deve mostrar 17+ |
+| MySQL Server | 8.0 ou superior | rodando na porta 3306 |
+| Git | qualquer | para clonar o repositório |
+
+O Maven **não** precisa ser instalado: o projeto traz o Maven Wrapper (`mvnw`), que baixa a versão correta na primeira execução (requer internet).
+
+<details>
+<summary>Instalação rápida das dependências</summary>
+
+**Windows (PowerShell):**
+
+```powershell
+winget install EclipseAdoptium.Temurin.17.JDK
+winget install Oracle.MySQL
 ```
 
-O Java permite que o projeto seja executado em diferentes sistemas operacionais através da JVM:
+**Ubuntu/Debian:**
 
-* Windows
-* Linux
-* macOS
+```bash
+sudo apt install openjdk-17-jdk mysql-server
+```
+
+**macOS (Homebrew):**
+
+```bash
+brew install openjdk@17 mysql
+brew services start mysql
+```
+
+</details>
+
+### 2. Clonar o repositório
+
+```bash
+git clone https://github.com/judesune/EcoLog-Alimentos.git
+cd EcoLog-Alimentos
+```
+
+### 3. Criar o banco de dados
+
+```bash
+mysql -u root -p < database/schema.sql
+```
+
+Opcional — carregar dados de exemplo (rode uma única vez):
+
+```bash
+mysql -u root -p --default-character-set=utf8mb4 < database/dados-exemplo.sql
+```
+
+### 4. Configurar a conexão
+
+Por padrão o sistema conecta em `jdbc:mysql://localhost:3306/ecolog_alimentos` com o usuário `root` **sem senha**. Se o seu MySQL tiver senha (ou outro usuário/porta), defina as variáveis de ambiente antes de executar:
+
+| Variável | Exemplo |
+| --- | --- |
+| `ECOLOG_DB_URL` | `jdbc:mysql://localhost:3306/ecolog_alimentos` |
+| `ECOLOG_DB_USUARIO` | `root` |
+| `ECOLOG_DB_SENHA` | `minhaSenha` |
+
+```powershell
+# Windows (PowerShell)
+$env:ECOLOG_DB_SENHA = "minhaSenha"
+```
+
+```bash
+# Linux / macOS
+export ECOLOG_DB_SENHA="minhaSenha"
+```
+
+### 5. Compilar e executar
+
+**Windows:**
+
+```powershell
+.\mvnw.cmd package
+java -jar target\ecolog-alimentos.jar
+```
+
+**Linux / macOS:**
+
+```bash
+./mvnw package
+java -jar target/ecolog-alimentos.jar
+```
+
+O `package` compila, roda os testes e gera um único `.jar` executável (com o driver do MySQL embutido). Como o sistema roda na JVM, o mesmo `.jar` funciona em Windows, Linux e macOS.
+
+### 6. Testes automatizados
+
+```bash
+./mvnw test
+```
+
+Os testes de modelo rodam sempre. O teste de integração com o MySQL (`PersistenciaMySqlTest`, que executa o CRUD completo e confere o `ON DELETE CASCADE`) só roda quando a variável `ECOLOG_DB_TESTE=true` está definida e o banco já foi criado; ele apaga os registros que cria.
+
+---
+
+# ✅ Atendimento à 2ª Entrega
+
+| Critério | Onde está no código |
+| --- | --- |
+| **Classe abstrata** | `model/LoteAlimento` (método abstrato `calcularPrioridadeTransporte()`), `repository/RepositorioJdbc`, `controller/MenuController` |
+| **Interface** | `repository/Repositorio<T>` — contrato do CRUD implementado pelos repositórios |
+| **Herança** | `LotePerecivel` e `LoteNaoPerecivel` estendem `LoteAlimento`; repositórios estendem `RepositorioJdbc`; controllers estendem `MenuController` |
+| **Polimorfismo (`@Override`)** | `calcularPrioridadeTransporte()`, `validar()`, `getTipoLote()` e `toString()` em cada tipo de lote; `OrdemTransporte.calcularPrioridadeGeral()` chama o método de cada lote sem saber seu tipo |
+| **Composição 1:N** | `OrdemTransporte` possui a lista de `LoteAlimento` (só alterada por `adicionarLote`/`removerLote`); no banco, `ON DELETE CASCADE` |
+| **Encapsulamento** | atributos `private` com getters/setters; a lista de lotes é exposta como somente leitura |
+| **CRUD da entidade principal** | `OrdemTransporte`: criar, listar, consultar, alterar dados, gerenciar lotes, atualizar status, cancelar e excluir |
+| **CRUD de apoio** | `PontoColeta` e `InstituicaoReceptora`: cadastrar, listar, consultar, alterar e excluir |
+| **Persistência em BD** | JDBC com `PreparedStatement` e transações (`repository/`), script em `database/schema.sql` compatível com as classes |
+| **Arquitetura em camadas** | `controller` → `service` → `repository` → `model` → MySQL |
+
+### Regras de negócio implementadas
+
+* Fluxo de status: **Pendente → Em Trânsito → Concluída**, e **Pendente → Cancelada**. Concluída e Cancelada são finais.
+* Somente ordens **pendentes** podem ter data, origem, destino ou lotes alterados, e somente elas podem ser canceladas.
+* Toda ordem precisa ter **pelo menos um lote** (composição 1..*).
+* Lotes vencidos ou que vencem antes da data agendada são recusados.
+* A carga refrigerada de uma ordem não pode exceder a **capacidade refrigerada** da instituição de destino.
+* Pontos de coleta e instituições com ordens vinculadas não podem ser excluídos; CNPJ não pode se repetir.
+* Ordens em trânsito não podem ser excluídas.
 
 ---
 
