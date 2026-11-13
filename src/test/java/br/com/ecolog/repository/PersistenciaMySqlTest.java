@@ -27,11 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Teste de integração do CRUD completo contra um MySQL real.
- * Só roda com a variável de ambiente ECOLOG_DB_TESTE=true (o banco precisa
- * estar criado com database/schema.sql). Os dados criados são removidos no fim.
- */
 @EnabledIfEnvironmentVariable(named = "ECOLOG_DB_TESTE", matches = "true")
 class PersistenciaMySqlTest {
 
@@ -54,7 +49,6 @@ class PersistenciaMySqlTest {
         InstituicaoReceptora instituicao = instituicaoService.cadastrar(new InstituicaoReceptora(null,
                 "ONG Teste", cnpjAleatorio(), "Rua ONG, 20", 50.0, "(44) 98888-0000"));
         try {
-            // CREATE
             OrdemTransporte ordem = ordemService.criar(LocalDate.now().plusDays(1), ponto.getId(),
                     instituicao.getId(), List.of(
                             new LotePerecivel(null, "Iogurte", "Laticínios", 20.0, LocalDate.now().plusDays(3),
@@ -63,18 +57,15 @@ class PersistenciaMySqlTest {
                                     "Saco plástico")));
             assertNotNull(ordem.getId());
 
-            // READ: a herança é reconstruída a partir da coluna tipo_lote
             OrdemTransporte lida = ordemService.buscar(ordem.getId());
             assertEquals(2, lida.getLotes().size());
             assertInstanceOf(LotePerecivel.class, lida.getLotesPorPrioridade().get(0));
             assertInstanceOf(LoteNaoPerecivel.class, lida.getLotesPorPrioridade().get(1));
             assertEquals(ponto.getRazaoSocial(), lida.getOrigem().getRazaoSocial());
 
-            // Regra: carga refrigerada maior que a capacidade do destino é recusada
             assertThrows(RegraNegocioException.class, () -> ordemService.adicionarLote(ordem.getId(),
                     new LotePerecivel(null, "Carne", "Carnes", 40.0, LocalDate.now().plusDays(2), -2.0, 4.0)));
 
-            // UPDATE: lotes (inserir, alterar, remover) e dados da ordem
             ordemService.adicionarLote(ordem.getId(), new LoteNaoPerecivel(null, "Feijão", "Grãos", 30.0,
                     LocalDate.now().plusDays(40), "Saco plástico"));
             Long idArroz = lida.getLotesPorPrioridade().get(1).getId();
@@ -91,14 +82,12 @@ class PersistenciaMySqlTest {
             assertTrue(atualizada.getLotes().stream().anyMatch(l -> l.getDescricao().equals("Arroz integral")));
             assertTrue(atualizada.getLotes().stream().noneMatch(l -> l.getId().equals(idIogurte)));
 
-            // UPDATE de status
             ordemService.atualizarStatus(ordem.getId(), OrdemTransporte.STATUS_EM_TRANSITO);
             assertThrows(RegraNegocioException.class, () -> ordemService.cancelar(ordem.getId()));
             assertThrows(RegraNegocioException.class, () -> pontoService.excluir(ponto.getId()));
             ordemService.atualizarStatus(ordem.getId(), OrdemTransporte.STATUS_CONCLUIDA);
             assertEquals(OrdemTransporte.STATUS_CONCLUIDA, ordemService.buscar(ordem.getId()).getStatus());
 
-            // DELETE: os lotes saem junto (ON DELETE CASCADE)
             List<Long> idsLotes = atualizada.getLotes().stream().map(LoteAlimento::getId).toList();
             ordemService.excluir(ordem.getId());
             assertTrue(ordemRepositorio.buscarPorId(ordem.getId()).isEmpty());

@@ -15,10 +15,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Regras de negócio da entidade principal: criação (RF5), consulta e
- * atualização de status (RF6), cancelamento (RF7) e gestão dos lotes (RF4).
- */
 public class OrdemTransporteService {
 
     private final OrdemTransporteRepository repositorio;
@@ -33,9 +29,7 @@ public class OrdemTransporteService {
         this.instituicaoRepositorio = instituicaoRepositorio;
     }
 
-    // ------------------------------------------------------------------
-    // CREATE
-    // ------------------------------------------------------------------
+
 
     public OrdemTransporte criar(LocalDate dataAgendada, Long idOrigem, Long idDestino, List<LoteAlimento> lotes) {
         validarDataAgendada(dataAgendada);
@@ -53,15 +47,10 @@ public class OrdemTransporteService {
         return repositorio.salvar(ordem);
     }
 
-    // ------------------------------------------------------------------
-    // READ
-    // ------------------------------------------------------------------
-
     public List<OrdemTransporte> listar() {
         return repositorio.listarTodos();
     }
 
-    /** Ordens pendentes da mais urgente para a menos urgente (priorização automática). */
     public List<OrdemTransporte> listarPendentesPorPrioridade() {
         return repositorio.listarTodos().stream()
                 .filter(OrdemTransporte::isEditavel)
@@ -75,11 +64,7 @@ public class OrdemTransporteService {
                 .orElseThrow(() -> new RegraNegocioException("Ordem de transporte #" + id + " não encontrada."));
     }
 
-    // ------------------------------------------------------------------
-    // UPDATE
-    // ------------------------------------------------------------------
 
-    /** Altera data, origem e destino de uma ordem ainda pendente. */
     public OrdemTransporte atualizarDados(Long id, LocalDate dataAgendada, Long idOrigem, Long idDestino) {
         OrdemTransporte ordem = buscarEditavel(id);
         validarDataAgendada(dataAgendada);
@@ -108,7 +93,6 @@ public class OrdemTransporteService {
         return ordem;
     }
 
-    /** Substitui os dados de um lote existente (pode inclusive trocar o tipo do lote). */
     public OrdemTransporte atualizarLote(Long idOrdem, LoteAlimento loteAtualizado) {
         OrdemTransporte ordem = buscarEditavel(idOrdem);
         exigirLote(ordem, loteAtualizado.getId());
@@ -132,7 +116,6 @@ public class OrdemTransporteService {
         return ordem;
     }
 
-    /** Pendente -> Em Trânsito -> Concluída; Pendente -> Cancelada. */
     public OrdemTransporte atualizarStatus(Long id, String novoStatus) {
         OrdemTransporte ordem = buscar(id);
         try {
@@ -153,10 +136,6 @@ public class OrdemTransporteService {
         return atualizarStatus(id, OrdemTransporte.STATUS_CANCELADA);
     }
 
-    // ------------------------------------------------------------------
-    // DELETE
-    // ------------------------------------------------------------------
-
     public void excluir(Long id) {
         OrdemTransporte ordem = buscar(id);
         if (OrdemTransporte.STATUS_EM_TRANSITO.equals(ordem.getStatus())) {
@@ -165,11 +144,6 @@ public class OrdemTransporteService {
         repositorio.excluir(id);
     }
 
-    // ------------------------------------------------------------------
-    // Regras auxiliares
-    // ------------------------------------------------------------------
-
-    /** Busca a ordem garantindo que ainda pode ser alterada (status Pendente). */
     public OrdemTransporte buscarEditavel(Long id) {
         OrdemTransporte ordem = buscar(id);
         if (!ordem.isEditavel()) {
@@ -207,7 +181,6 @@ public class OrdemTransporteService {
         }
     }
 
-    /** Usa a validação polimórfica de cada tipo de lote e confere a validade com a data da coleta. */
     private static void validarLote(LoteAlimento lote, LocalDate dataAgendada) {
         if (lote == null) {
             throw new RegraNegocioException("Informe os dados do lote.");
@@ -219,7 +192,6 @@ public class OrdemTransporteService {
         RegraNegocioException.lancarSeHouver(erros);
     }
 
-    /** Perecíveis refrigerados/congelados não podem exceder a câmara fria do destino. */
     private static void validarCapacidadeRefrigerada(OrdemTransporte ordem) {
         double pesoRefrigerado = ordem.getLotes().stream()
                 .filter(lote -> lote instanceof LotePerecivel && ((LotePerecivel) lote).isRefrigerado())

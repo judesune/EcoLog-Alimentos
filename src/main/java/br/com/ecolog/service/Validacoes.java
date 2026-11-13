@@ -3,7 +3,6 @@ package br.com.ecolog.service;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/** Validações de formato reutilizadas pelos serviços de cadastro. */
 final class Validacoes {
 
     private static final Pattern EMAIL = Pattern.compile("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)+$");
@@ -19,7 +18,6 @@ final class Validacoes {
         }
     }
 
-    /** Aceita CNPJ com ou sem pontuação, desde que tenha 14 dígitos. */
     static void cnpj(List<String> erros, String cnpj) {
         String digitos = somenteDigitos(cnpj);
         if (digitos.length() != 14 || digitos.chars().distinct().count() == 1) {
@@ -42,7 +40,6 @@ final class Validacoes {
         }
     }
 
-    /** Formata o CNPJ no padrão 00.000.000/0000-00 para gravar sempre igual. */
     static String formatarCnpj(String cnpj) {
         String d = somenteDigitos(cnpj);
         if (d.length() != 14) {

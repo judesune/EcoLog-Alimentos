@@ -1,19 +1,9 @@
--- =====================================================================
--- EcoLog Alimentos - Script de criação do banco de dados (MySQL 8.0+)
--- Fiel ao DER da 1ª entrega (docs/DER.pdf).
--- Execução: mysql -u root -p < database/schema.sql
--- =====================================================================
-
 CREATE DATABASE IF NOT EXISTS ecolog_alimentos
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
 USE ecolog_alimentos;
 
--- ---------------------------------------------------------------------
--- Ponto de coleta: estabelecimento que disponibiliza o excedente
--- Classe Java: br.com.ecolog.model.PontoColeta
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS tb_ponto_coleta (
     id_coleta     BIGINT       NOT NULL AUTO_INCREMENT,
     razao_social  VARCHAR(150) NOT NULL,
@@ -25,10 +15,6 @@ CREATE TABLE IF NOT EXISTS tb_ponto_coleta (
     CONSTRAINT uk_ponto_coleta_cnpj UNIQUE (cnpj)
 ) ENGINE = InnoDB;
 
--- ---------------------------------------------------------------------
--- Instituição receptora: entidade social que recebe os alimentos
--- Classe Java: br.com.ecolog.model.InstituicaoReceptora
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS tb_instituicao_receptora (
     id_receptora              BIGINT        NOT NULL AUTO_INCREMENT,
     razao_social              VARCHAR(150)  NOT NULL,
@@ -41,10 +27,6 @@ CREATE TABLE IF NOT EXISTS tb_instituicao_receptora (
     CONSTRAINT ck_instituicao_capacidade CHECK (capacidade_refrigerada_kg >= 0)
 ) ENGINE = InnoDB;
 
--- ---------------------------------------------------------------------
--- Ordem de transporte: entidade principal do CRUD
--- Classe Java: br.com.ecolog.model.OrdemTransporte
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS tb_ordem_transporte (
     id_ordem        BIGINT      NOT NULL AUTO_INCREMENT,
     data_agendada   DATE        NOT NULL,
@@ -60,12 +42,6 @@ CREATE TABLE IF NOT EXISTS tb_ordem_transporte (
         CHECK (status IN ('PENDENTE', 'EM_TRANSITO', 'CONCLUIDA', 'CANCELADA'))
 ) ENGINE = InnoDB;
 
--- ---------------------------------------------------------------------
--- Lote de alimento: herança mapeada em tabela única (single table).
--- tipo_lote = 'PERECIVEL'     -> LotePerecivel   (temperatura_minima/maxima)
--- tipo_lote = 'NAO_PERECIVEL' -> LoteNaoPerecivel (tipo_embalagem)
--- Composição 1:N com a ordem: ON DELETE CASCADE.
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS tb_lote_alimento (
     id_lote            BIGINT        NOT NULL AUTO_INCREMENT,
     descricao          VARCHAR(120)  NOT NULL,

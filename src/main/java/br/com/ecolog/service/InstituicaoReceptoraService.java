@@ -7,7 +7,6 @@ import br.com.ecolog.repository.OrdemTransporteRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Regras de negócio do cadastro de instituições receptoras (RF2). */
 public class InstituicaoReceptoraService {
 
     private final InstituicaoReceptoraRepository repositorio;

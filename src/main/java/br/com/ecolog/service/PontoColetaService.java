@@ -7,7 +7,6 @@ import br.com.ecolog.repository.PontoColetaRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Regras de negócio do cadastro de pontos de coleta (RF1). */
 public class PontoColetaService {
 
     private final PontoColetaRepository repositorio;

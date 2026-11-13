@@ -1,8 +1,3 @@
--- =====================================================================
--- EcoLog Alimentos - Dados de exemplo (opcional)
--- Rode depois do schema.sql: mysql -u root -p < database/dados-exemplo.sql
--- =====================================================================
-
 USE ecolog_alimentos;
 
 INSERT INTO tb_ponto_coleta (razao_social, cnpj, endereco, telefone, email) VALUES

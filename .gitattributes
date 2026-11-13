@@ -1,4 +1,3 @@
-# Mantém os scripts executáveis compatíveis com cada sistema operacional
 mvnw     text eol=lf
 *.sh     text eol=lf
 *.cmd    text eol=crlf

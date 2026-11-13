@@ -1,10 +1,7 @@
-# Build do Maven
 target/
 
-# Wrapper do Maven baixa a distribuição aqui
 .mvn/wrapper/maven-wrapper.jar
 
-# IDEs
 .idea/
 *.iml
 .vscode/
@@ -14,6 +11,5 @@ target/
 out/
 bin/
 
-# Sistema operacional
 .DS_Store
 Thumbs.db
