@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Menu de CRUD da entidade principal, OrdemTransporte (RF4 a RF7). */
 public class OrdemTransporteController extends MenuController {
 
     private static final List<String> STATUS_POSSIVEIS = List.of(
@@ -73,10 +72,6 @@ public class OrdemTransporteController extends MenuController {
         }
     }
 
-    // ------------------------------------------------------------------
-    // CREATE
-    // ------------------------------------------------------------------
-
     private void criar() {
         exigirCadastrosBase();
         LocalDate data = console.lerData("Data agendada da coleta");
@@ -96,10 +91,6 @@ public class OrdemTransporteController extends MenuController {
                 + ordem.calcularPrioridadeGeral() + ".");
     }
 
-    // ------------------------------------------------------------------
-    // READ
-    // ------------------------------------------------------------------
-
     private void listar(List<OrdemTransporte> ordens, String mensagemVazia) {
         if (ordens.isEmpty()) {
             console.escrever(mensagemVazia);
@@ -116,10 +107,6 @@ public class OrdemTransporteController extends MenuController {
         console.escrever("  Lotes (do mais urgente para o menos urgente):");
         ordem.getLotesPorPrioridade().forEach(lote -> console.escrever("    " + lote));
     }
-
-    // ------------------------------------------------------------------
-    // UPDATE
-    // ------------------------------------------------------------------
 
     private void alterarDados() {
         OrdemTransporte ordem = service.buscarEditavel(console.lerId("Código da ordem"));
@@ -173,10 +160,6 @@ public class OrdemTransporteController extends MenuController {
         }
     }
 
-    // ------------------------------------------------------------------
-    // DELETE
-    // ------------------------------------------------------------------
-
     private void excluir() {
         OrdemTransporte ordem = service.buscar(console.lerId("Código da ordem"));
         console.escrever(ordem.toString());
@@ -185,10 +168,6 @@ public class OrdemTransporteController extends MenuController {
             console.sucesso("Ordem #" + ordem.getId() + " e seus lotes foram excluídos.");
         }
     }
-
-    // ------------------------------------------------------------------
-    // Apoio
-    // ------------------------------------------------------------------
 
     private void exigirCadastrosBase() {
         if (pontoColetaService.listar().isEmpty() || instituicaoService.listar().isEmpty()) {

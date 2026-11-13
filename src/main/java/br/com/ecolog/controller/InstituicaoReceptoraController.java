@@ -6,7 +6,6 @@ import br.com.ecolog.view.EntradaConsole;
 
 import java.util.List;
 
-/** Menu de CRUD de instituições receptoras (RF2). */
 public class InstituicaoReceptoraController extends MenuController {
 
     private final InstituicaoReceptoraService service;

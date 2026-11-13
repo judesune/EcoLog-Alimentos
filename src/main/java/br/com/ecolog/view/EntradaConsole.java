@@ -9,11 +9,6 @@ import java.time.format.ResolverStyle;
 import java.util.Arrays;
 import java.util.Scanner;
 
-/**
- * Leitura e escrita no terminal, com conversão e nova tentativa em caso de
- * valor inválido. Os métodos "Opcional" mantêm o valor atual quando o usuário
- * só aperta Enter (usados nas telas de edição).
- */
 public class EntradaConsole {
 
     public static final DateTimeFormatter FORMATO_DATA =
@@ -70,7 +65,6 @@ public class EntradaConsole {
                     return numero;
                 }
             } catch (NumberFormatException ignorado) {
-                // cai na mensagem abaixo
             }
             erro(String.format("Digite um número entre %d e %d.", minimo, maximo));
         }
@@ -85,7 +79,6 @@ public class EntradaConsole {
                     return numero;
                 }
             } catch (NumberFormatException ignorado) {
-                // cai na mensagem abaixo
             }
             erro("Digite um código numérico válido.");
         }
@@ -103,7 +96,6 @@ public class EntradaConsole {
                     return numero;
                 }
             } catch (NumberFormatException ignorado) {
-                // cai na mensagem abaixo
             }
             erro("Digite um código numérico válido.");
         }
@@ -170,10 +162,6 @@ public class EntradaConsole {
         }
     }
 
-    /**
-     * Lê uma senha (pode ser vazia). No terminal interativo os caracteres não
-     * aparecem na tela; com entrada redirecionada, lê a linha normalmente.
-     */
     public String lerSenha(String rotulo) {
         Console terminal = System.console();
         if (terminal == null) {
@@ -206,7 +194,6 @@ public class EntradaConsole {
         if (!scanner.hasNextLine()) {
             throw new EntradaEncerradaException();
         }
-        // Remove o BOM que alguns terminais/redirecionamentos inserem no início da entrada
         return scanner.nextLine().replace("﻿", "");
     }
 

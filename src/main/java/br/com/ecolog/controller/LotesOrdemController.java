@@ -7,7 +7,6 @@ import br.com.ecolog.view.EntradaConsole;
 
 import java.util.List;
 
-/** Submenu que gerencia os lotes (composição) de uma ordem específica. */
 class LotesOrdemController extends MenuController {
 
     private final OrdemTransporteService service;

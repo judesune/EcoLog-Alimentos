@@ -6,11 +6,6 @@ import br.com.ecolog.view.EntradaConsole;
 
 import java.util.List;
 
-/**
- * Base abstrata de todos os menus do terminal (Template Method): o laço de
- * exibição e o tratamento de erros ficam aqui, e cada controller concreto
- * sobrescreve título, opções e a ação de cada opção.
- */
 public abstract class MenuController {
 
     protected final EntradaConsole console;
@@ -19,21 +14,16 @@ public abstract class MenuController {
         this.console = console;
     }
 
-    /** Título exibido no topo do menu. */
     protected abstract String getTitulo();
 
-    /** Opções numeradas a partir de 1, na ordem exibida. */
     protected abstract List<String> getOpcoes();
 
-    /** Executa a opção escolhida (1..n). */
     protected abstract void executarOpcao(int opcao);
 
-    /** Texto da opção 0. */
     protected String getRotuloSaida() {
         return "Voltar";
     }
 
-    /** Mostra o menu até o usuário escolher 0. */
     public final void exibir() {
         while (true) {
             console.titulo(getTitulo());

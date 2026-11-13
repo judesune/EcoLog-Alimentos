@@ -7,7 +7,6 @@ import br.com.ecolog.view.EntradaConsole;
 
 import java.time.LocalDate;
 
-/** Monta um lote (perecível ou não perecível) a partir do que o usuário digita. */
 class LeitorLote {
 
     private static final String PERECIVEL = "1";
@@ -19,7 +18,6 @@ class LeitorLote {
         this.console = console;
     }
 
-    /** Lê um lote novo (RF4). */
     LoteAlimento lerNovo() {
         String tipo = console.lerInteiro("Tipo do lote (1 - Perecível | 2 - Não perecível)", 1, 2) == 1
                 ? PERECIVEL : NAO_PERECIVEL;
@@ -37,7 +35,6 @@ class LeitorLote {
         return new LoteNaoPerecivel(null, descricao, categoria, quantidade, validade, embalagem);
     }
 
-    /** Lê as alterações de um lote existente; Enter mantém cada valor atual. */
     LoteAlimento lerAlteracao(LoteAlimento atual) {
         console.escrever("Enter mantém o valor atual.");
         String tipoAtual = atual instanceof LotePerecivel ? PERECIVEL : NAO_PERECIVEL;

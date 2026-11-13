@@ -6,7 +6,6 @@ import br.com.ecolog.view.EntradaConsole;
 
 import java.util.List;
 
-/** Menu de CRUD de pontos de coleta (RF1). */
 public class PontoColetaController extends MenuController {
 
     private final PontoColetaService service;

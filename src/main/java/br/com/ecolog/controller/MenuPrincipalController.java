@@ -4,7 +4,6 @@ import br.com.ecolog.view.EntradaConsole;
 
 import java.util.List;
 
-/** Menu inicial do sistema, que direciona para os demais menus. */
 public class MenuPrincipalController extends MenuController {
 
     private final List<MenuController> submenus;
@@ -25,7 +24,6 @@ public class MenuPrincipalController extends MenuController {
         return submenus.stream().map(MenuController::getTitulo).toList();
     }
 
-    /** Polimorfismo: cada submenu sabe se exibir, independentemente do tipo concreto. */
     @Override
     protected void executarOpcao(int opcao) {
         submenus.get(opcao - 1).exibir();

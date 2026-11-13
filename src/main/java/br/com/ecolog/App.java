@@ -22,7 +22,6 @@ import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Scanner;
 
-/** Ponto de entrada: monta as camadas (Repository -> Service -> Controller) e abre o menu. */
 public final class App {
 
     private App() {
@@ -68,13 +67,6 @@ public final class App {
         console.escrever("Até logo!");
     }
 
-    /**
-     * Tenta conectar com a configuração padrão (database.properties / variáveis
-     * de ambiente). Se falhar, pede usuário e senha do MySQL no terminal e tenta
-     * de novo, até conectar ou o usuário desistir.
-     *
-     * @return conexão testada, ou {@code null} se o usuário desistiu
-     */
     private static ConexaoBanco conectar(EntradaConsole console) {
         ConexaoBanco conexaoBanco = new ConexaoBanco();
         String usuario = "root";
@@ -96,7 +88,6 @@ public final class App {
         }
     }
 
-    /** Usa a codificação do terminal (ex.: CP850 no Windows) para exibir acentos corretamente. */
     private static Charset charsetDoTerminal() {
         Console terminal = System.console();
         return terminal != null ? terminal.charset() : Charset.defaultCharset();
