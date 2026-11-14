@@ -26,12 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * Persistência da entidade principal {@link OrdemTransporte} e da sua composição
- * de lotes ({@code tb_ordem_transporte} + {@code tb_lote_alimento}).
- * <p>
- * Ordem e lotes são gravados na mesma transação: ou tudo é salvo, ou nada é.
- */
 public class OrdemTransporteRepository extends RepositorioJdbc<OrdemTransporte> {
 
     private static final String SELECT_ORDEM =
@@ -51,10 +45,6 @@ public class OrdemTransporteRepository extends RepositorioJdbc<OrdemTransporte> 
     public OrdemTransporteRepository(ConexaoBanco conexaoBanco) {
         super(conexaoBanco);
     }
-
-    // ------------------------------------------------------------------
-    // CREATE
-    // ------------------------------------------------------------------
 
     @Override
     public OrdemTransporte salvar(OrdemTransporte ordem) {
@@ -84,10 +74,6 @@ public class OrdemTransporteRepository extends RepositorioJdbc<OrdemTransporte> 
             throw new PersistenciaException("Erro ao cadastrar ordem de transporte", e);
         }
     }
-
-    // ------------------------------------------------------------------
-    // READ
-    // ------------------------------------------------------------------
 
     @Override
     public Optional<OrdemTransporte> buscarPorId(Long id) {
@@ -131,14 +117,6 @@ public class OrdemTransporteRepository extends RepositorioJdbc<OrdemTransporte> 
         return contar("SELECT COUNT(*) FROM tb_ordem_transporte WHERE fk_id_receptora = ?", idInstituicao);
     }
 
-    // ------------------------------------------------------------------
-    // UPDATE
-    // ------------------------------------------------------------------
-
-    /**
-     * Atualiza os dados da ordem e sincroniza os lotes: insere os novos,
-     * atualiza os existentes e apaga os que foram removidos da ordem.
-     */
     @Override
     public void atualizar(OrdemTransporte ordem) {
         String sql = "UPDATE tb_ordem_transporte SET data_agendada = ?, status = ?, fk_id_coleta = ?, "
@@ -163,10 +141,6 @@ public class OrdemTransporteRepository extends RepositorioJdbc<OrdemTransporte> 
             throw new PersistenciaException("Erro ao atualizar ordem de transporte #" + ordem.getId(), e);
         }
     }
-
-    // ------------------------------------------------------------------
-    // DELETE (os lotes caem junto via ON DELETE CASCADE)
-    // ------------------------------------------------------------------
 
     @Override
     protected String sqlExcluir() {
@@ -207,10 +181,6 @@ public class OrdemTransporteRepository extends RepositorioJdbc<OrdemTransporte> 
                 destino);
     }
 
-    // ------------------------------------------------------------------
-    // Lotes (composição)
-    // ------------------------------------------------------------------
-
     private void carregarLotes(Connection conexao, List<OrdemTransporte> ordens) throws SQLException {
         if (ordens.isEmpty()) {
             return;
@@ -236,7 +206,6 @@ public class OrdemTransporteRepository extends RepositorioJdbc<OrdemTransporte> 
         }
     }
 
-    /** Cria a subclasse correta de lote conforme a coluna {@code tipo_lote}. */
     private static LoteAlimento mapearLote(ResultSet resultado) throws SQLException {
         Long id = resultado.getLong("id_lote");
         String descricao = resultado.getString("descricao");
@@ -317,7 +286,6 @@ public class OrdemTransporteRepository extends RepositorioJdbc<OrdemTransporte> 
         }
     }
 
-    /** Preenche os 8 primeiros parâmetros; as colunas específicas de cada subclasse ficam nulas na outra. */
     private static void preencherCamposLote(PreparedStatement comando, LoteAlimento lote) throws SQLException {
         comando.setString(1, lote.getDescricao());
         comando.setString(2, lote.getCategoria());

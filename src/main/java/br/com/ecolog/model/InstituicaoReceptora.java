@@ -2,10 +2,6 @@ package br.com.ecolog.model;
 
 import java.util.Objects;
 
-/**
- * Entidade social que recebe os alimentos resgatados.
- * Mapeada em {@code tb_instituicao_receptora}.
- */
 public class InstituicaoReceptora {
 
     private Long id;

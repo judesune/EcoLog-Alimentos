@@ -6,20 +6,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Classe abstrata que reúne o que é comum a todo lote de alimento resgatado.
- * <p>
- * Cada tipo concreto de lote ({@link LotePerecivel} e {@link LoteNaoPerecivel})
- * define a própria regra de prioridade sobrescrevendo
- * {@link #calcularPrioridadeTransporte()} (polimorfismo).
- */
 public abstract class LoteAlimento {
 
-    /** Escala de prioridade usada por todos os lotes: 0 (baixa) a 100 (máxima). */
     public static final int PRIORIDADE_MINIMA = 0;
     public static final int PRIORIDADE_MAXIMA = 100;
 
-    /** Formato de data exibido nas descrições (dd/mm/aaaa). */
     public static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private Long id;
@@ -39,24 +30,13 @@ public abstract class LoteAlimento {
         this.dataValidade = dataValidade;
     }
 
-    /**
-     * Calcula a prioridade de transporte deste lote (0 a 100).
-     * Quanto maior o valor, mais cedo o lote deve ser despachado.
-     */
+
     public abstract int calcularPrioridadeTransporte();
 
-    /** Identificador do tipo, gravado na coluna {@code tipo_lote}. */
     public abstract String getTipoLote();
 
-    /** Descrição legível do tipo, usada nas telas. */
     public abstract String getDescricaoTipo();
 
-    /**
-     * Valida os dados comuns do lote. Subclasses sobrescrevem para acrescentar
-     * as próprias regras, chamando {@code super.validar()} primeiro.
-     *
-     * @return lista de problemas encontrados (vazia se o lote é válido)
-     */
     public List<String> validar() {
         List<String> erros = new ArrayList<>();
         if (descricao == null || descricao.isBlank()) {
@@ -82,7 +62,6 @@ public abstract class LoteAlimento {
         return erros;
     }
 
-    /** Dias que faltam até o vencimento (negativo se já venceu). */
     public long getDiasAteVencimento() {
         return ChronoUnit.DAYS.between(LocalDate.now(), dataValidade);
     }
@@ -91,7 +70,6 @@ public abstract class LoteAlimento {
         return getDiasAteVencimento() < 0;
     }
 
-    /** Limita qualquer cálculo de prioridade à escala 0..100. */
     protected static int limitarPrioridade(int prioridade) {
         return Math.max(PRIORIDADE_MINIMA, Math.min(PRIORIDADE_MAXIMA, prioridade));
     }

@@ -11,13 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Base abstrata dos repositórios JDBC: concentra a leitura por id, a listagem e
- * a exclusão, deixando para cada subclasse o SQL e o mapeamento da linha
- * (padrão Template Method).
- *
- * @param <T> tipo da entidade persistida
- */
 public abstract class RepositorioJdbc<T> implements Repositorio<T> {
 
     protected final ConexaoBanco conexaoBanco;
@@ -26,16 +19,12 @@ public abstract class RepositorioJdbc<T> implements Repositorio<T> {
         this.conexaoBanco = conexaoBanco;
     }
 
-    /** SELECT que filtra pela chave primária (um parâmetro). */
     protected abstract String sqlBuscarPorId();
 
-    /** SELECT de todas as linhas. */
     protected abstract String sqlListarTodos();
 
-    /** DELETE pela chave primária (um parâmetro). */
     protected abstract String sqlExcluir();
 
-    /** Converte a linha atual do ResultSet na entidade. */
     protected abstract T mapearLinha(ResultSet resultado) throws SQLException;
 
     @Override
@@ -77,7 +66,6 @@ public abstract class RepositorioJdbc<T> implements Repositorio<T> {
         }
     }
 
-    /** Lê a chave gerada pelo AUTO_INCREMENT após um INSERT. */
     protected static Long obterIdGerado(Statement comando) throws SQLException {
         try (ResultSet chaves = comando.getGeneratedKeys()) {
             if (!chaves.next()) {
@@ -87,7 +75,6 @@ public abstract class RepositorioJdbc<T> implements Repositorio<T> {
         }
     }
 
-    /** Executa um SELECT COUNT(*) com um parâmetro long. */
     protected long contar(String sql, Long parametro) {
         try (Connection conexao = conexaoBanco.abrirConexao();
              PreparedStatement comando = conexao.prepareStatement(sql)) {

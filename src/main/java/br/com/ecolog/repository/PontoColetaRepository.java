@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
 
-/** Persistência de {@link PontoColeta} na tabela {@code tb_ponto_coleta}. */
 public class PontoColetaRepository extends RepositorioJdbc<PontoColeta> {
 
     private static final String COLUNAS = "id_coleta, razao_social, cnpj, endereco, telefone, email";

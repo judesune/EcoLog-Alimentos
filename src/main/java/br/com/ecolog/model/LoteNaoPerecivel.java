@@ -4,10 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Lote de alimento não perecível (grãos, enlatados, massas...), que não
- * depende de cadeia refrigerada.
- */
 public class LoteNaoPerecivel extends LoteAlimento {
 
     public static final String TIPO = "NAO_PERECIVEL";
@@ -23,11 +19,6 @@ public class LoteNaoPerecivel extends LoteAlimento {
         this.tipoEmbalagem = tipoEmbalagem;
     }
 
-    /**
-     * Não perecíveis têm prioridade padrão mais baixa, orientada pelo prazo de
-     * validade, pelo volume (cargas grandes ocupam o veículo e precisam ser
-     * planejadas) e pelo tipo de embalagem (embalagens frágeis exigem cuidado).
-     */
     @Override
     public int calcularPrioridadeTransporte() {
         long dias = getDiasAteVencimento();

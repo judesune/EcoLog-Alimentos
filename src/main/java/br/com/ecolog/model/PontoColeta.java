@@ -2,10 +2,6 @@ package br.com.ecolog.model;
 
 import java.util.Objects;
 
-/**
- * Estabelecimento parceiro (supermercado, feira, cooperativa) que disponibiliza
- * alimentos excedentes para resgate. Mapeado em {@code tb_ponto_coleta}.
- */
 public class PontoColeta {
 
     private Long id;

@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
 
-/** Persistência de {@link InstituicaoReceptora} na tabela {@code tb_instituicao_receptora}. */
 public class InstituicaoReceptoraRepository extends RepositorioJdbc<InstituicaoReceptora> {
 
     private static final String COLUNAS =

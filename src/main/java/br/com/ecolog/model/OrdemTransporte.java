@@ -7,11 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Entidade principal do sistema: liga um {@link PontoColeta} (origem) a uma
- * {@link InstituicaoReceptora} (destino) e é composta por um ou mais
- * {@link LoteAlimento} (composição 1:N — os lotes só existem dentro da ordem).
- */
 public class OrdemTransporte {
 
     public static final String STATUS_PENDENTE = "PENDENTE";
@@ -39,20 +34,11 @@ public class OrdemTransporte {
         this.destino = destino;
     }
 
-    // ------------------------------------------------------------------
-    // Composição: gerenciamento dos lotes da ordem
-    // ------------------------------------------------------------------
-
     public void adicionarLote(LoteAlimento lote) {
         Objects.requireNonNull(lote, "O lote não pode ser nulo.");
         lotes.add(lote);
     }
 
-    /**
-     * Remove o lote com o identificador informado.
-     *
-     * @throws IllegalArgumentException se o lote não pertencer à ordem
-     */
     public void removerLote(Long idLote) {
         boolean removido = lotes.removeIf(lote -> lote.getId() != null && lote.getId().equals(idLote));
         if (!removido) {
@@ -68,22 +54,16 @@ public class OrdemTransporte {
                         "O lote #" + idLote + " não pertence à ordem #" + id + "."));
     }
 
-    /** Lista imutável: lotes só entram ou saem pelos métodos da própria ordem. */
     public List<LoteAlimento> getLotes() {
         return Collections.unmodifiableList(lotes);
     }
 
-    /** Lotes ordenados do mais urgente para o menos urgente. */
     public List<LoteAlimento> getLotesPorPrioridade() {
         List<LoteAlimento> ordenados = new ArrayList<>(lotes);
         ordenados.sort(Comparator.comparingInt(LoteAlimento::calcularPrioridadeTransporte).reversed());
         return ordenados;
     }
 
-    /**
-     * Prioridade da ordem = prioridade do lote mais urgente. Cada lote calcula
-     * a sua de forma polimórfica (perecível ou não perecível).
-     */
     public int calcularPrioridadeGeral() {
         return lotes.stream()
                 .mapToInt(LoteAlimento::calcularPrioridadeTransporte)
@@ -97,16 +77,6 @@ public class OrdemTransporte {
                 .sum();
     }
 
-    // ------------------------------------------------------------------
-    // Ciclo de vida: Pendente -> Em trânsito -> Concluída | Pendente -> Cancelada
-    // ------------------------------------------------------------------
-
-    /**
-     * Altera o status respeitando o fluxo operacional da ordem.
-     *
-     * @throws IllegalArgumentException se o status for desconhecido
-     * @throws IllegalStateException    se a transição não for permitida
-     */
     public void atualizarStatus(String novoStatus) {
         if (!isStatusValido(novoStatus)) {
             throw new IllegalArgumentException("Status inválido: " + novoStatus);
@@ -129,7 +99,6 @@ public class OrdemTransporte {
         }
     }
 
-    /** A carga só pode ser alterada enquanto a ordem não saiu para transporte. */
     public boolean isEditavel() {
         return STATUS_PENDENTE.equals(status);
     }
@@ -156,10 +125,6 @@ public class OrdemTransporte {
                 return status;
         }
     }
-
-    // ------------------------------------------------------------------
-    // Getters e setters
-    // ------------------------------------------------------------------
 
     public Long getId() {
         return id;
